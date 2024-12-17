@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
+import { ConfigService } from '@nestjs/config';
 
 export class PaymentDto {
   amount: number;
@@ -10,8 +11,8 @@ export class PaymentDto {
 export class PaymentsService {
   private stripe: Stripe;
 
-  constructor() {
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  constructor(private configService: ConfigService) {
+    this.stripe = new Stripe(this.configService.get('STRIPE_SECRET_KEY'));
   }
 
   public createPaymentIntent({ amount, currency }: PaymentDto) {
