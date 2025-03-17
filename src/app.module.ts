@@ -6,6 +6,7 @@ import { PaymentMethodsModule } from './payments/payment-methods.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { CustomersModule } from './customers/customers.module';
+import { TransactionsModule } from './transactions/transactions.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { CustomersModule } from './customers/customers.module';
     PaymentMethodsModule,
     UsersModule,
     CustomersModule,
+    TransactionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

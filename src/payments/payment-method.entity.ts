@@ -1,10 +1,11 @@
+import { Transaction } from 'src/transactions/transaction.entity';
 import { User } from 'src/users/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   ManyToOne,
   Column,
-  //OneToMany,
+  OneToMany,
 } from 'typeorm';
 
 @Entity()
@@ -18,6 +19,6 @@ export class PaymentMethod {
   @Column({ unique: true })
   stripePaymentMethodId: string;
 
-  // @OneToMany(() => Transaction, (transaction) => transaction.paymentMethod)
-  // transactions: Transaction[];
+  @OneToMany(() => Transaction, (transaction) => transaction.paymentMethod)
+  transactions: Transaction[];
 }
