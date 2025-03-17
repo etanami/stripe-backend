@@ -1,10 +1,11 @@
 import { Exclude } from 'class-transformer';
+import { Customer } from 'src/customers/customer.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  // OneToOne,
-  // JoinColumn,
+  OneToOne,
+  JoinColumn,
   // OneToMany,
   // Transaction,
 } from 'typeorm';
@@ -24,9 +25,9 @@ export class User {
   @Column({
     type: 'varchar',
     length: 96,
-    nullable: false,
+    nullable: true,
   })
-  lastName: string;
+  lastName?: string;
 
   @Column({
     type: 'varchar',
@@ -39,8 +40,18 @@ export class User {
   @Column({
     type: 'varchar',
     length: 96,
-    nullable: true,
+    nullable: false,
   })
   @Exclude()
-  password?: string;
+  password: string;
+
+  @OneToOne(() => Customer, (customer) => customer.user)
+  @JoinColumn()
+  customer: Customer;
+
+  // @OneToMany(() => PaymentMethod, (paymentMethod) => paymentMethod.user)
+  // paymentMethods: PaymentMethod[];
+
+  // @OneToMany(() => Transaction, (transaction) => transaction.user)
+  // transactions: Transaction[];
 }
