@@ -1,7 +1,7 @@
 import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
-export class PaymentDto {
+export class PaymentMethodsDto {
   @IsNumber()
   @IsNotEmpty()
   @Transform(({ value }) => parseInt(value))

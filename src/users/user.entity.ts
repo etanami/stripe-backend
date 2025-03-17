@@ -1,12 +1,13 @@
 import { Exclude } from 'class-transformer';
 import { Customer } from 'src/customers/customer.entity';
+import { PaymentMethod } from 'src/payments/payment-method.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   OneToOne,
   JoinColumn,
-  // OneToMany,
+  OneToMany,
   // Transaction,
 } from 'typeorm';
 
@@ -49,8 +50,8 @@ export class User {
   @JoinColumn()
   customer: Customer;
 
-  // @OneToMany(() => PaymentMethod, (paymentMethod) => paymentMethod.user)
-  // paymentMethods: PaymentMethod[];
+  @OneToMany(() => PaymentMethod, (paymentMethod) => paymentMethod.user)
+  paymentMethods: PaymentMethod[];
 
   // @OneToMany(() => Transaction, (transaction) => transaction.user)
   // transactions: Transaction[];
