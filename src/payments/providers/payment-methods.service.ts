@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import Stripe from 'stripe';
 import { ConfigService } from '@nestjs/config';
 import { PaymentMethodsDto } from '../dtos/payment-methods-dto';
@@ -6,16 +6,16 @@ import { HandleWebhookEventProvider } from './handle-webhook-event.provider.';
 
 @Injectable()
 export class PaymentMethodsService {
-  private stripe: Stripe;
-
   constructor(
+    // Inject Stripe
+    @Inject('Stripe')
+    private readonly stripe: Stripe,
+
     private configService: ConfigService,
 
     // Inject handleWebhookEventProvider
     private readonly handleWebhookEventProvider: HandleWebhookEventProvider,
-  ) {
-    this.stripe = new Stripe(this.configService.get('STRIPE_SECRET_KEY'));
-  }
+  ) {}
 
   async createPayment(paymentDto: PaymentMethodsDto) {
     try {
