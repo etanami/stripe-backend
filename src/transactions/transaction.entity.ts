@@ -1,6 +1,12 @@
 import { PaymentMethod } from 'src/payments/payment-method.entity';
 import { User } from 'src/users/user.entity';
-import { Entity, PrimaryGeneratedColumn, ManyToOne, Column } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  Column,
+  CreateDateColumn,
+} from 'typeorm';
 import { paymentStatus } from './enums/payment-status.enum';
 
 @Entity()
@@ -31,9 +37,6 @@ export class Transaction {
   })
   paymentStatus: paymentStatus;
 
-  @Column({
-    type: 'timestamp',
-    nullable: false,
-  })
-  created_at: Date;
+  @CreateDateColumn()
+  createdAt: Date;
 }
