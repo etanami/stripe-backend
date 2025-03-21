@@ -16,7 +16,7 @@ export class PaymentMethod {
   @ManyToOne(() => User, (user) => user.paymentMethods)
   user: User;
 
-  @Column({ unique: true })
+  @Column()
   stripePaymentMethodId: string;
 
   @OneToMany(() => Transaction, (transaction) => transaction.paymentMethod)

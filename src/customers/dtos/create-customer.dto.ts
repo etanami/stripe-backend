@@ -1,11 +1,16 @@
 import { IsNotEmpty, IsString } from 'class-validator';
-import { User } from 'src/users/user.entity';
 
 export class CreateCustomerDto {
   @IsNotEmpty()
-  user: User;
+  firstName: string;
+
+  @IsNotEmpty()
+  lastName: string;
 
   @IsString()
   @IsNotEmpty()
-  stripeCustomerId: string;
+  email: string;
+
+  @IsNotEmpty()
+  userId: number;
 }

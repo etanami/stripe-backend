@@ -9,6 +9,8 @@ import { Customer } from '../customer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateCustomerDto } from '../dtos/create-customer.dto';
 import Stripe from 'stripe';
+import { UsersService } from 'src/users/providers/users.service';
+import { User } from 'src/users/user.entity';
 
 @Injectable()
 export class CustomersService {
@@ -20,6 +22,9 @@ export class CustomersService {
     // Injecting customersRepository
     @InjectRepository(Customer)
     private readonly customersRepository: Repository<Customer>,
+
+    // Inject usersService
+    private readonly usersService: UsersService,
   ) {}
 
   /**
@@ -29,9 +34,14 @@ export class CustomersService {
     // Check if customer exists
     let customer = undefined;
 
+    const user = await this.usersService.findOneById(createCustomerDto.userId);
+    if (!user) {
+      throw new BadRequestException('User does not exist');
+    }
+
     try {
       customer = await this.customersRepository.findOne({
-        where: createCustomerDto.user,
+        where: { user },
       });
     } catch (error) {
       throw new RequestTimeoutException(error);
@@ -43,10 +53,10 @@ export class CustomersService {
     }
 
     // If not, create a new stripe customer
-    const customerName = `${createCustomerDto.user.firstName} ${createCustomerDto.user.lastName}`;
+    const customerName = `${createCustomerDto.firstName} ${createCustomerDto.lastName}`;
 
     const stripeCustomer = await this.stripe.customers.create({
-      email: createCustomerDto.user.email,
+      email: createCustomerDto.email,
       name: customerName,
     });
 
@@ -54,7 +64,7 @@ export class CustomersService {
 
     // Create a new customer and save to DB
     let newCustomer = this.customersRepository.create({
-      ...createCustomerDto.user,
+      user,
       stripeCustomerId: stripeCustomer.id,
     });
 
@@ -65,5 +75,23 @@ export class CustomersService {
     }
 
     return newCustomer;
+  }
+
+  public async getCustomerById(user: User) {
+    let customer = undefined;
+
+    try {
+      customer = await this.customersRepository.findOne({
+        where: {
+          user: { id: user.id },
+        },
+      });
+    } catch (error) {
+      throw new RequestTimeoutException(error);
+    }
+
+    if (!customer) {
+      throw new BadRequestException('No customer found');
+    }
   }
 }
