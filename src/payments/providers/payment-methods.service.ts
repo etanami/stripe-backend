@@ -35,21 +35,42 @@ export class PaymentMethodsService {
         userId: paymentIntentsDto.user.id,
       };
 
-      const { stripeCustomerId } =
-        await this.customersService.create(customerData);
+      let stripeCustomer;
 
-      // Create and store the payment method in the DB
-      const paymentMethod = this.paymentMethod.create({
-        stripePaymentMethodId: paymentIntentsDto.stripePaymentMethodId,
-        user: paymentIntentsDto.user,
+      // Check for existing payment method first
+      const paymentMethodId = paymentIntentsDto.stripePaymentMethodId;
+
+      let existingPaymentMethod = await this.paymentMethod.findOne({
+        where: {
+          stripePaymentMethodId: paymentMethodId,
+        },
       });
 
-      await this.paymentMethod.save(paymentMethod);
+      if (!existingPaymentMethod) {
+        // Create a new customer to attach to the payment method
+        stripeCustomer = await this.customersService.create(customerData);
+
+        // Create a new payment method entry in the DB
+        const newPaymentMethod = this.paymentMethod.create({
+          stripePaymentMethodId: paymentMethodId,
+          user: { id: paymentIntentsDto.user.id },
+        });
+
+        try {
+          await this.paymentMethod.save(newPaymentMethod);
+          existingPaymentMethod = newPaymentMethod;
+        } catch (error) {
+          throw new BadRequestException(
+            'Payment method does not exist in the database',
+          );
+        }
+      }
 
       // Create payment intent
       const paymentIntent = await this.createNewPaymentIntent(
         paymentIntentsDto,
-        stripeCustomerId,
+        existingPaymentMethod.stripePaymentMethodId,
+        stripeCustomer.stripeCustomerId,
       );
 
       return {
@@ -66,12 +87,13 @@ export class PaymentMethodsService {
    */
   private async createNewPaymentIntent(
     paymentIntentsDto: PaymentIntentsDto,
+    paymentMethodId: string,
     stripeCustomerId: string,
   ) {
     return this.stripe.paymentIntents.create({
       //metadata: {userId},
       //setup_future_usage: 'off_session',
-      payment_method: paymentIntentsDto.stripePaymentMethodId,
+      payment_method: paymentMethodId,
       currency: 'usd',
       customer: stripeCustomerId,
       amount: paymentIntentsDto.amount,

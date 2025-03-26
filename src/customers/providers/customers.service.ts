@@ -31,25 +31,28 @@ export class CustomersService {
    * Create a new Customer
    */
   public async create(createCustomerDto: CreateCustomerDto) {
-    // Check if customer exists
-    let customer = undefined;
+    let customer;
 
+    // Check if user exists
     const user = await this.usersService.findOneById(createCustomerDto.userId);
     if (!user) {
       throw new BadRequestException('User does not exist');
     }
 
     try {
+      // Check if customer exists
       customer = await this.customersRepository.findOne({
-        where: { user },
+        where: { user: { id: createCustomerDto.userId } },
+        relations: {
+          user: true,
+        },
       });
-    } catch (error) {
-      throw new RequestTimeoutException(error);
-    }
 
-    // Throw error if customer already exists
-    if (customer) {
-      throw new BadRequestException('Stripe customer already exists');
+      if (customer) {
+        return customer;
+      }
+    } catch (error) {
+      throw error;
     }
 
     // If not, create a new stripe customer
@@ -60,21 +63,19 @@ export class CustomersService {
       name: customerName,
     });
 
-    console.log(stripeCustomer);
-
     // Create a new customer and save to DB
-    let newCustomer = this.customersRepository.create({
+    customer = this.customersRepository.create({
       user,
       stripeCustomerId: stripeCustomer.id,
     });
 
     try {
-      newCustomer = await this.customersRepository.save(newCustomer);
+      customer = await this.customersRepository.save(customer);
     } catch (error) {
       throw new RequestTimeoutException(error);
     }
 
-    return newCustomer;
+    return customer;
   }
 
   public async getCustomerById(user: User) {
