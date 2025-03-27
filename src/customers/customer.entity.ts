@@ -9,6 +9,9 @@ export class Customer {
   @OneToOne(() => User, (user) => user.customer)
   user: User;
 
-  @Column({ unique: true })
+  @Column({
+    unique: true,
+    name: 'stripe_customer_id',
+  })
   stripeCustomerId: string;
 }

@@ -26,7 +26,10 @@ export class Transaction {
   })
   amount: number;
 
-  @Column({ unique: true })
+  @Column({
+    unique: true,
+    name: 'stripe_transaction_id',
+  })
   stripeTransactionId: string;
 
   @Column({
@@ -34,9 +37,10 @@ export class Transaction {
     enum: paymentStatus,
     default: paymentStatus.SUCCESSFUL,
     nullable: false,
+    name: 'payment_status',
   })
   paymentStatus: paymentStatus;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 }
