@@ -60,6 +60,7 @@ export class PaymentMethodsService {
           await this.paymentMethod.save(newPaymentMethod);
           existingPaymentMethod = newPaymentMethod;
         } catch (error) {
+          console.error('Error ocurred', error);
           throw error;
         }
       }
@@ -76,6 +77,7 @@ export class PaymentMethodsService {
         clientSecret: paymentIntent.client_secret,
       };
     } catch (error) {
+      console.error('Error ocurred', error);
       throw new BadRequestException(error.message);
     }
   }

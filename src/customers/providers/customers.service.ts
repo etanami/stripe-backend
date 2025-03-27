@@ -63,6 +63,7 @@ export class CustomersService {
     try {
       customer = await this.customersRepository.save(customer);
     } catch (error) {
+      console.error('Error ocurred', error);
       throw error;
     }
 

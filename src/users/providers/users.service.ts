@@ -33,6 +33,7 @@ export class UsersService {
     try {
       newUser = await this.usersRepository.save(newUser);
     } catch (error) {
+      console.error('Error ocurred', error);
       throw error;
     }
 
