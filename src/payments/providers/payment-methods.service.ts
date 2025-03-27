@@ -60,9 +60,7 @@ export class PaymentMethodsService {
           await this.paymentMethod.save(newPaymentMethod);
           existingPaymentMethod = newPaymentMethod;
         } catch (error) {
-          throw new BadRequestException(
-            'Payment method does not exist in the database',
-          );
+          throw error;
         }
       }
 

@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  Inject,
-  Injectable,
-  RequestTimeoutException,
-} from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Customer } from '../customer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -39,20 +34,16 @@ export class CustomersService {
       throw new BadRequestException('User does not exist');
     }
 
-    try {
-      // Check if customer exists
-      customer = await this.customersRepository.findOne({
-        where: { user: { id: createCustomerDto.userId } },
-        relations: {
-          user: true,
-        },
-      });
+    // Check if customer exists
+    customer = await this.customersRepository.findOne({
+      where: { user: { id: createCustomerDto.userId } },
+      relations: {
+        user: true,
+      },
+    });
 
-      if (customer) {
-        return customer;
-      }
-    } catch (error) {
-      throw error;
+    if (customer) {
+      return customer;
     }
 
     // If not, create a new stripe customer
@@ -66,13 +57,13 @@ export class CustomersService {
     // Create a new customer and save to DB
     customer = this.customersRepository.create({
       user,
-      stripeCustomerId: stripeCustomer.id,
+      stripeCustomerId: stripeCustomer?.id,
     });
 
     try {
       customer = await this.customersRepository.save(customer);
     } catch (error) {
-      throw new RequestTimeoutException(error);
+      throw error;
     }
 
     return customer;
@@ -81,18 +72,16 @@ export class CustomersService {
   public async getCustomerById(user: User) {
     let customer = undefined;
 
-    try {
-      customer = await this.customersRepository.findOne({
-        where: {
-          user: { id: user.id },
-        },
-      });
-    } catch (error) {
-      throw new RequestTimeoutException(error);
-    }
+    customer = await this.customersRepository.findOne({
+      where: {
+        user: { id: user.id },
+      },
+    });
 
     if (!customer) {
       throw new BadRequestException('No customer found');
     }
+
+    return customer;
   }
 }

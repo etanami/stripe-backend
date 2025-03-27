@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  RequestTimeoutException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from '../user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -21,23 +17,11 @@ export class UsersService {
    */
   public async create(createUserDto: CreateUserDto) {
     // Check if user exists
-    let existingUser: User | undefined;
-
-    try {
-      existingUser = await this.usersRepository.findOne({
-        where: {
-          email: createUserDto.email,
-        },
-      });
-    } catch (error) {
-      // Handle exception
-      throw new RequestTimeoutException(
-        'Unable to process your request at the moment. Please try again later.',
-        {
-          description: 'Error connecting to the database',
-        },
-      );
-    }
+    const existingUser = await this.usersRepository.findOne({
+      where: {
+        email: createUserDto.email,
+      },
+    });
 
     if (existingUser) {
       throw new BadRequestException('The user already exists');
@@ -49,13 +33,7 @@ export class UsersService {
     try {
       newUser = await this.usersRepository.save(newUser);
     } catch (error) {
-      // Handle exception
-      throw new RequestTimeoutException(
-        'Unable to process your request at the moment. Please try again later.',
-        {
-          description: 'Error connecting to the database',
-        },
-      );
+      throw error;
     }
 
     return newUser;
@@ -65,19 +43,8 @@ export class UsersService {
    * Find a user by Id
    */
   public async findOneById(id: number) {
-    let user = undefined;
-
     // Find user in the DB
-    try {
-      user = await this.usersRepository.findOneBy({ id });
-    } catch (error) {
-      throw new RequestTimeoutException(
-        'Unable to process your request at the moment. Please try again later.',
-        {
-          description: 'Error connecting to the database',
-        },
-      );
-    }
+    const user = await this.usersRepository.findOneBy({ id });
 
     // Handle exception
     if (!user) {
