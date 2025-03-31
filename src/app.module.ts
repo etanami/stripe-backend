@@ -8,6 +8,7 @@ import { UsersModule } from './users/users.module';
 import { CustomersModule } from './customers/customers.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { StripeModule } from './stripe/stripe.module';
+import { StripeCustomersModule } from './stripe-customers/stripe-customers.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { StripeModule } from './stripe/stripe.module';
     CustomersModule,
     TransactionsModule,
     StripeModule,
+    StripeCustomersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
