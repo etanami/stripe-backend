@@ -23,7 +23,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     } else if (exception instanceof QueryFailedError) {
       // Handle TypeORM database errors
       console.error('Database Error:', exception.message);
-      message = 'A database error occurred';
+      message = 'An error occurred. Please try again later.';
     }
 
     response.status(status).json({
