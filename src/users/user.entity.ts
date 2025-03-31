@@ -20,6 +20,7 @@ export class User {
     type: 'varchar',
     length: 96,
     nullable: false,
+    name: 'first_name',
   })
   firstName: string;
 
@@ -27,6 +28,7 @@ export class User {
     type: 'varchar',
     length: 96,
     nullable: true,
+    name: 'last_name',
   })
   lastName?: string;
 
