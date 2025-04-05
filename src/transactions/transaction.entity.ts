@@ -1,4 +1,4 @@
-import { PaymentMethod } from 'src/payments/payment-method.entity';
+import { PaymentMethod } from 'src/payments/entities/payment-method.entity';
 import { User } from 'src/users/user.entity';
 import {
   Entity,

@@ -3,7 +3,7 @@ import { PaymentsController } from './payment-methods.controller';
 import { PaymentMethodsService } from './providers/payment-methods.service';
 import { HandleWebhookEventProvider } from './providers/handle-webhook-event.provider.';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PaymentMethod } from './payment-method.entity';
+import { PaymentMethod } from './entities/payment-method.entity';
 import { CustomersModule } from 'src/customers/customers.module';
 
 @Module({

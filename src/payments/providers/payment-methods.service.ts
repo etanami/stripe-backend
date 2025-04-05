@@ -4,7 +4,7 @@ import { PaymentIntentsDto } from '../dtos/payment-intents-dto';
 import { HandleWebhookEventProvider } from './handle-webhook-event.provider.';
 import { CustomersService } from 'src/customers/providers/customers.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaymentMethod } from '../payment-method.entity';
+import { PaymentMethod } from '../entities/payment-method.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
