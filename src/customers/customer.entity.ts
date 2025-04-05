@@ -20,7 +20,7 @@ export class Customer {
   email: string;
 
   @Column({ nullable: true })
-  phone: string;
+  phone?: string;
 
   @OneToOne(() => StripeCustomer)
   @JoinColumn({ name: 'stripe_customer_id' })

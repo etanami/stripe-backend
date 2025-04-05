@@ -29,10 +29,10 @@ export class PaymentMethodsService {
     try {
       // Create a new Stripe customer and get the Id
       const customerData = {
-        firstName: paymentIntentsDto.user.firstName,
-        lastName: paymentIntentsDto.user.lastName,
+        name: paymentIntentsDto.user.name,
         email: paymentIntentsDto.user.email,
         userId: paymentIntentsDto.user.id,
+        phone: paymentIntentsDto.user.phone,
       };
 
       let stripeCustomer;

@@ -6,6 +6,7 @@ import { CreateCustomerDto } from '../dtos/create-customer.dto';
 import Stripe from 'stripe';
 import { UsersService } from 'src/users/providers/users.service';
 import { User } from 'src/users/user.entity';
+import { StripeCustomersService } from 'src/stripe-customers/providers/stripe-customers.service';
 
 @Injectable()
 export class CustomersService {
@@ -20,6 +21,9 @@ export class CustomersService {
 
     // Inject usersService
     private readonly usersService: UsersService,
+
+    // Inject stripeCustomersService
+    private readonly stripeCustomersService: StripeCustomersService,
   ) {}
 
   /**
@@ -30,6 +34,7 @@ export class CustomersService {
 
     // Check if user exists
     const user = await this.usersService.findOneById(createCustomerDto.userId);
+
     if (!user) {
       throw new BadRequestException('User does not exist');
     }
@@ -47,17 +52,18 @@ export class CustomersService {
     }
 
     // If not, create a new stripe customer
-    const customerName = `${createCustomerDto.firstName} ${createCustomerDto.lastName}`;
-
-    const stripeCustomer = await this.stripe.customers.create({
+    const stripeCustomer = await this.stripeCustomersService.create({
+      name: createCustomerDto.name,
       email: createCustomerDto.email,
-      name: customerName,
     });
 
     // Create a new customer and save to DB
     customer = this.customersRepository.create({
+      name: createCustomerDto.name,
+      email: createCustomerDto.email,
+      phone: createCustomerDto.phone,
       user,
-      stripeCustomerId: stripeCustomer?.id,
+      stripeCustomer,
     });
 
     try {
