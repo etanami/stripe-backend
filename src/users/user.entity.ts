@@ -20,17 +20,8 @@ export class User {
     type: 'varchar',
     length: 96,
     nullable: false,
-    name: 'first_name',
   })
-  firstName: string;
-
-  @Column({
-    type: 'varchar',
-    length: 96,
-    nullable: true,
-    name: 'last_name',
-  })
-  lastName?: string;
+  name: string;
 
   @Column({
     type: 'varchar',
@@ -45,11 +36,18 @@ export class User {
     length: 96,
     nullable: false,
   })
+  phone: string;
+
+  @Column({
+    type: 'varchar',
+    length: 96,
+    nullable: false,
+  })
   @Exclude()
   password: string;
 
   @OneToOne(() => Customer, (customer) => customer.user)
-  @JoinColumn()
+  @JoinColumn({ name: 'customer_id' })
   customer: Customer;
 
   @OneToMany(() => PaymentMethod, (paymentMethod) => paymentMethod.user)
