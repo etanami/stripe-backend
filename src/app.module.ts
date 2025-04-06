@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { PaymentMethodsModule } from './payments/payment-methods.module';
+import { PaymentsModule } from './payments/payments.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { CustomersModule } from './customers/customers.module';
@@ -28,7 +28,7 @@ import { StripeCustomersModule } from './stripe-customers/stripe-customers.modul
         synchronize: true,
       }),
     }),
-    PaymentMethodsModule,
+    PaymentsModule,
     UsersModule,
     CustomersModule,
     TransactionsModule,
