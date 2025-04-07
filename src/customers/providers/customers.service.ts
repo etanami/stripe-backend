@@ -44,6 +44,7 @@ export class CustomersService {
       where: { user: { id: createCustomerDto.userId } },
       relations: {
         user: true,
+        stripeCustomer: true,
       },
     });
 
