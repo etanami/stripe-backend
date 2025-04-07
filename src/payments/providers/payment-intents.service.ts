@@ -84,4 +84,8 @@ export class PaymentIntentsService {
       throw new BadRequestException(error.message);
     }
   }
+
+  public async handleWebhookEvent(req, res) {
+    return await this.handleWebhookEventProvider.handleWebhookEvent(req, res);
+  }
 }

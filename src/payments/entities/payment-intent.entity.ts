@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { PaymentMethod } from './payment-method.entity';
+import { paymentStatus } from 'src/transactions/enums/payment-status.enum';
 
 @Entity()
 export class PaymentIntent {
@@ -16,6 +17,13 @@ export class PaymentIntent {
 
   @Column('decimal', { precision: 10, scale: 2 })
   amount: number;
+
+  @Column({
+    type: 'enum',
+    enum: paymentStatus,
+    default: paymentStatus.PENDING,
+  })
+  status: paymentStatus;
 
   @Column({
     name: 'stripe_payment_intent_id',

@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Req, Res } from '@nestjs/common';
 import { PaymentIntentsDto } from './dtos/payment-intents-dto';
 import { PaymentIntentsService } from './providers/payment-intents.service';
 
@@ -14,8 +14,8 @@ export class PaymentsController {
     return this.paymentIntentsService.createPaymentIntent(paymentIntentsDto);
   }
 
-  // @Post('webhook')
-  // handleWebhookEvent(@Req() req, @Res() res) {
-  //   return this.paymentIntentsService.handleWebhookEvent(req, res);
-  // }
+  @Post('webhook')
+  handleWebhookEvent(@Req() req, @Res() res) {
+    return this.paymentIntentsService.handleWebhookEvent(req, res);
+  }
 }
