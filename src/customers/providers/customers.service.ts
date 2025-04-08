@@ -69,6 +69,10 @@ export class CustomersService {
 
     try {
       customer = await this.customersRepository.save(customer);
+
+      // Update the user with the new customer
+      user.customer = customer;
+      await this.usersService.updateCustomerInUser(user);
     } catch (error) {
       console.error('Error ocurred', error);
       throw error;

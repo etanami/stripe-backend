@@ -46,7 +46,7 @@ export class User {
   @Exclude()
   password: string;
 
-  @OneToOne(() => Customer, (customer) => customer.user)
+  @OneToOne(() => Customer, (customer) => customer.user, { cascade: true })
   @JoinColumn({ name: 'customer_id' })
   customer: Customer;
 

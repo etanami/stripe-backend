@@ -13,13 +13,13 @@ export class Customer {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 96, nullable: false })
   name: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 96, nullable: false, unique: true })
   email: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'varchar', length: 96, nullable: true })
   phone?: string;
 
   @OneToOne(() => StripeCustomer)

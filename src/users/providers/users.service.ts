@@ -54,4 +54,16 @@ export class UsersService {
 
     return user;
   }
+
+  /**
+   * Update the customer field in the user table
+   */
+  public async updateCustomerInUser(user: User) {
+    try {
+      return await this.usersRepository.save(user);
+    } catch (error) {
+      console.error('Error occurred while updating the user', error);
+      throw error;
+    }
+  }
 }
