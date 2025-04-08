@@ -3,6 +3,7 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -34,7 +35,11 @@ export class PaymentIntent {
   @ManyToMany(
     () => PaymentMethod,
     (paymentMethod) => paymentMethod.paymentIntents,
+    {
+      cascade: true,
+    },
   )
+  @JoinTable({ name: 'payment_method_intent' })
   paymentMethods: PaymentMethod[];
 
   @ManyToOne(() => User)

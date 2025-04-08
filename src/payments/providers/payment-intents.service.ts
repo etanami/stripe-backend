@@ -54,13 +54,13 @@ export class PaymentIntentsService {
         setup_future_usage: 'off_session', // Attaches payment method to customer for future payments
         //metadata: {userId},
       });
-      //console.log(paymentIntent);
 
       // Create a new payment intent entry in the DB
       const newPaymentIntent = this.paymentIntentRepository.create({
         amount: paymentIntentsDto.amount,
         stripePaymentIntentId: paymentIntent.id,
         user: { id: paymentIntentsDto.user.id },
+        paymentMethods: [paymentMethod],
       });
 
       try {

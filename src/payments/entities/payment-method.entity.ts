@@ -8,7 +8,6 @@ import {
   OneToMany,
   JoinColumn,
   ManyToMany,
-  JoinTable,
 } from 'typeorm';
 import { PaymentIntent } from './payment-intent.entity';
 
@@ -31,7 +30,6 @@ export class PaymentMethod {
     () => PaymentIntent,
     (paymentIntent) => paymentIntent.paymentMethods,
   )
-  @JoinTable({ name: 'payment_method_intent' })
   paymentIntents: PaymentIntent[];
 
   @OneToMany(() => Transaction, (transaction) => transaction.paymentMethod)
