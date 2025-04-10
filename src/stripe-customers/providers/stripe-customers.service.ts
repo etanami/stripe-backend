@@ -3,7 +3,7 @@ import Stripe from 'stripe';
 import { CreateStripeCustomerDto } from '../dtos/create-stripe-customer.dto';
 import { StripeCustomer } from '../stripe-customer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 
 @Injectable()
 export class StripeCustomersService {
@@ -17,21 +17,35 @@ export class StripeCustomersService {
     private readonly stripeCustomersRepository: Repository<StripeCustomer>,
   ) {}
 
-  public async create(createStripeCustomerDto: CreateStripeCustomerDto) {
-    // Create a stripe customer
-    const stripeCustomer = await this.stripe.customers.create({
-      name: createStripeCustomerDto.name,
+  public async create(
+    createStripeCustomerDto: CreateStripeCustomerDto,
+    entityManager?: EntityManager,
+  ) {
+    let stripeCustomer;
+
+    // Check if stripe customer exists first
+    const stripeCustomerList = await this.stripe.customers.list({
       email: createStripeCustomerDto.email,
     });
 
+    if (stripeCustomerList.data.length > 0) {
+      stripeCustomer = stripeCustomerList.data[0];
+    } else {
+      // If not, create a new stripe customer
+      stripeCustomer = await this.stripe.customers.create({
+        name: createStripeCustomerDto.name,
+        email: createStripeCustomerDto.email,
+      });
+    }
+
     // Save new stripe customer to DB
-    const newStripeCustomer = this.stripeCustomersRepository.create({
+    const newStripeCustomer = entityManager.create(StripeCustomer, {
       customerId: stripeCustomer.id,
       metadata: stripeCustomer.metadata,
     });
 
     try {
-      return this.stripeCustomersRepository.save(newStripeCustomer);
+      return entityManager.save(newStripeCustomer);
     } catch (error) {
       throw error;
     }

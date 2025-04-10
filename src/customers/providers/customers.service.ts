@@ -1,5 +1,5 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { Customer } from '../customer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateCustomerDto } from '../dtos/create-customer.dto';
@@ -30,55 +30,64 @@ export class CustomersService {
    * Create a new Customer
    */
   public async create(createCustomerDto: CreateCustomerDto) {
-    let customer;
+    return await this.customersRepository.manager.transaction(
+      async (transactionalEntityManager: EntityManager) => {
+        let customer;
 
-    // Check if user exists
-    const user = await this.usersService.findOneById(createCustomerDto.userId);
+        // Check if user exists
+        const user = await this.usersService.findOneById(
+          createCustomerDto.userId,
+        );
 
-    if (!user) {
-      throw new BadRequestException('User does not exist');
-    }
+        if (!user) {
+          throw new BadRequestException('User does not exist');
+        }
 
-    // Check if customer exists
-    customer = await this.customersRepository.findOne({
-      where: { user: { id: createCustomerDto.userId } },
-      relations: {
-        user: true,
-        stripeCustomer: true,
+        // Check if customer exists
+        customer = await transactionalEntityManager.findOne(Customer, {
+          where: { user: { id: createCustomerDto.userId } },
+          relations: {
+            user: true,
+            stripeCustomer: true,
+          },
+        });
+
+        if (customer) {
+          return customer;
+        }
+
+        // If not, create a new stripe customer
+        const stripeCustomer = await this.stripeCustomersService.create(
+          {
+            name: createCustomerDto.name,
+            email: createCustomerDto.email,
+          },
+          transactionalEntityManager,
+        );
+
+        // Create a new customer and save to DB
+        customer = this.customersRepository.create({
+          name: createCustomerDto.name,
+          email: createCustomerDto.email,
+          phone: createCustomerDto.phone,
+          user,
+          stripeCustomer,
+        });
+
+        try {
+          customer = await transactionalEntityManager.save(Customer, customer);
+
+          // Update the user with the new customer
+          user.customer = customer;
+          await transactionalEntityManager.save(User, user);
+        } catch (error) {
+          console.error('Error ocurred', error);
+          throw error;
+        }
+
+        return customer;
       },
-    });
-
-    if (customer) {
-      return customer;
-    }
-
-    // If not, create a new stripe customer
-    const stripeCustomer = await this.stripeCustomersService.create({
-      name: createCustomerDto.name,
-      email: createCustomerDto.email,
-    });
-
-    // Create a new customer and save to DB
-    customer = this.customersRepository.create({
-      name: createCustomerDto.name,
-      email: createCustomerDto.email,
-      phone: createCustomerDto.phone,
-      user,
-      stripeCustomer,
-    });
-
-    try {
-      customer = await this.customersRepository.save(customer);
-
-      // Update the user with the new customer
-      user.customer = customer;
-      await this.usersService.updateCustomerInUser(user);
-    } catch (error) {
-      console.error('Error ocurred', error);
-      throw error;
-    }
-
-    return customer;
+    );
   }
 
   public async getCustomerById(user: User) {
