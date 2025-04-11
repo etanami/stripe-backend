@@ -9,6 +9,7 @@ import { CustomersModule } from './customers/customers.module';
 import { TransactionsModule } from './transactions/transactions.module';
 import { StripeModule } from './stripe/stripe.module';
 import { StripeCustomersModule } from './stripe-customers/stripe-customers.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -16,16 +17,16 @@ import { StripeCustomersModule } from './stripe-customers/stripe-customers.modul
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
+      useFactory: async (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get('DB_HOST'),
-        port: configService.get('DB_PORT'),
+        port: parseInt(configService.get('DB_PORT')),
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_NAME'),
         //entities: [User],
         autoLoadEntities: true,
-        synchronize: true,
+        synchronize: false,
       }),
     }),
     PaymentsModule,
@@ -34,6 +35,7 @@ import { StripeCustomersModule } from './stripe-customers/stripe-customers.modul
     TransactionsModule,
     StripeModule,
     StripeCustomersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],
