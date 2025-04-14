@@ -1,4 +1,4 @@
-import { PaymentMethod } from 'src/payments/payment-method.entity';
+import { PaymentMethod } from 'src/payments/entities/payment-method.entity';
 import { User } from 'src/users/user.entity';
 import {
   Entity,
@@ -26,7 +26,10 @@ export class Transaction {
   })
   amount: number;
 
-  @Column({ unique: true })
+  @Column({
+    unique: true,
+    name: 'stripe_transaction_id',
+  })
   stripeTransactionId: string;
 
   @Column({
@@ -34,9 +37,10 @@ export class Transaction {
     enum: paymentStatus,
     default: paymentStatus.SUCCESSFUL,
     nullable: false,
+    name: 'payment_status',
   })
   paymentStatus: paymentStatus;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }

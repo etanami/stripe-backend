@@ -6,18 +6,31 @@ import {
   ManyToOne,
   Column,
   OneToMany,
+  JoinColumn,
+  ManyToMany,
 } from 'typeorm';
+import { PaymentIntent } from './payment-intent.entity';
 
 @Entity()
 export class PaymentMethod {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({
+    unique: true,
+    name: 'stripe_payment_method_id',
+  })
+  stripePaymentMethodId: string;
+
   @ManyToOne(() => User, (user) => user.paymentMethods)
+  @JoinColumn({ name: 'user_id' })
   user: User;
 
-  @Column({ unique: true })
-  stripePaymentMethodId: string;
+  @ManyToMany(
+    () => PaymentIntent,
+    (paymentIntent) => paymentIntent.paymentMethods,
+  )
+  paymentIntents: PaymentIntent[];
 
   @OneToMany(() => Transaction, (transaction) => transaction.paymentMethod)
   transactions: Transaction[];

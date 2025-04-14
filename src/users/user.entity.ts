@@ -1,6 +1,6 @@
 import { Exclude } from 'class-transformer';
 import { Customer } from 'src/customers/customer.entity';
-import { PaymentMethod } from 'src/payments/payment-method.entity';
+import { PaymentMethod } from 'src/payments/entities/payment-method.entity';
 import { Transaction } from 'src/transactions/transaction.entity';
 import {
   Entity,
@@ -21,14 +21,7 @@ export class User {
     length: 96,
     nullable: false,
   })
-  firstName: string;
-
-  @Column({
-    type: 'varchar',
-    length: 96,
-    nullable: true,
-  })
-  lastName?: string;
+  name: string;
 
   @Column({
     type: 'varchar',
@@ -43,11 +36,18 @@ export class User {
     length: 96,
     nullable: false,
   })
+  phone: string;
+
+  @Column({
+    type: 'varchar',
+    length: 96,
+    nullable: false,
+  })
   @Exclude()
   password: string;
 
-  @OneToOne(() => Customer, (customer) => customer.user)
-  @JoinColumn()
+  @OneToOne(() => Customer, (customer) => customer.user, { cascade: true })
+  @JoinColumn({ name: 'customer_id' })
   customer: Customer;
 
   @OneToMany(() => PaymentMethod, (paymentMethod) => paymentMethod.user)

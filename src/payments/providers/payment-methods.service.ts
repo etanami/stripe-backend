@@ -1,45 +1,42 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import Stripe from 'stripe';
-import { ConfigService } from '@nestjs/config';
-import { PaymentMethodsDto } from '../dtos/payment-methods-dto';
-import { HandleWebhookEventProvider } from './handle-webhook-event.provider.';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PaymentMethod } from '../entities/payment-method.entity';
+import { Repository } from 'typeorm';
+import { PaymentMethodsDto } from '../dtos/payment-methods-dto copy';
 
 @Injectable()
 export class PaymentMethodsService {
-  private stripe: Stripe;
-
   constructor(
-    private configService: ConfigService,
+    // Inject paymentMethod repository
+    @InjectRepository(PaymentMethod)
+    private readonly paymentMethod: Repository<PaymentMethod>,
+  ) {}
 
-    // Inject handleWebhookEventProvider
-    private readonly handleWebhookEventProvider: HandleWebhookEventProvider,
-  ) {
-    this.stripe = new Stripe(this.configService.get('STRIPE_SECRET_KEY'));
-  }
-
-  async createPayment(paymentDto: PaymentMethodsDto) {
-    try {
-      const paymentIntent = await this.createNewPaymentIntent(paymentDto);
-
-      return {
-        id: paymentIntent.id,
-        clientSecret: paymentIntent.client_secret,
-      };
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
-  }
-
-  private createNewPaymentIntent(paymentDto: PaymentMethodsDto) {
-    return this.stripe.paymentIntents.create({
-      ...paymentDto,
-      //metadata: {userId},
-      setup_future_usage: 'off_session',
-      payment_method_types: ['card'],
+  public async createPaymentMethod(paymentMethodsDto: PaymentMethodsDto) {
+    // Check for existing payment method first
+    const existingPaymentMethod = await this.paymentMethod.findOne({
+      where: {
+        stripePaymentMethodId: paymentMethodsDto.stripePaymentMethodId,
+      },
+      relations: ['user'],
     });
-  }
 
-  public handleWebhookEvent(req, res) {
-    return this.handleWebhookEventProvider.handleWebhookEvent(req, res);
+    // Return payment method if found
+    if (existingPaymentMethod) {
+      return existingPaymentMethod;
+    }
+
+    // If not, create a new payment method entry in the DB
+    const newPaymentMethod = this.paymentMethod.create({
+      stripePaymentMethodId: paymentMethodsDto.stripePaymentMethodId,
+      user: { id: paymentMethodsDto.userId },
+    });
+
+    try {
+      return await this.paymentMethod.save(newPaymentMethod);
+    } catch (error) {
+      console.error('Error ocurred', error);
+      throw error;
+    }
   }
 }

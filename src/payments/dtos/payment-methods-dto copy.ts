@@ -1,13 +1,10 @@
-import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
 
 export class PaymentMethodsDto {
   @IsNumber()
-  @IsNotEmpty()
-  @Transform(({ value }) => parseInt(value))
-  amount: number;
+  userId: number;
 
   @IsString()
   @IsNotEmpty()
-  currency: string;
+  stripePaymentMethodId: string;
 }
