@@ -10,6 +10,14 @@ import { TransactionsModule } from './transactions/transactions.module';
 import { StripeModule } from './stripe/stripe.module';
 import { StripeCustomersModule } from './stripe-customers/stripe-customers.module';
 import { AuthModule } from './auth/auth.module';
+// import { APP_GUARD } from '@nestjs/core';
+// import { AuthenticationGuard } from './auth/guards/auth.guard';
+// import { AccessTokenGuard } from './auth/guards/access-token.guard';
+import { JwtModule } from '@nestjs/jwt';
+import jwtConfig from './auth/config/jwt.config';
+import { JwtGuard } from './auth/guards/jwt.guard';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtStrategy } from './auth/strategy/jwt.strategy';
 
 @Module({
   imports: [
@@ -29,6 +37,8 @@ import { AuthModule } from './auth/auth.module';
         synchronize: false,
       }),
     }),
+    ConfigModule.forFeature(jwtConfig),
+    JwtModule.registerAsync(jwtConfig.asProvider()),
     PaymentsModule,
     UsersModule,
     CustomersModule,
@@ -38,6 +48,14 @@ import { AuthModule } from './auth/auth.module';
     AuthModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: JwtGuard,
+    },
+    JwtStrategy,
+    // AccessTokenGuard,
+  ],
 })
 export class AppModule {}

@@ -3,7 +3,9 @@ import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import { UsersService } from 'src/users/providers/users.service';
 import { SignInDto } from './dtos/sign-in.dto';
 import { AuthService } from './providers/auth.service';
+import { Public } from './decorators/public.decorator';
 
+@Public()
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -19,6 +21,7 @@ export class AuthController {
     return this.usersService.create(createUserDto);
   }
 
+  //@UseGuards(AuthGuard('local'))
   @Post('login')
   @HttpCode(HttpStatus.OK)
   public signIn(@Body() signInDto: SignInDto) {
